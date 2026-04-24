@@ -10,13 +10,11 @@ if (isset($_POST['login'])) {
 
     // Prepared statement = sin SQL injection
     $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username =?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt->execute([$username]);
+    $result = $stmt->fetchAll();
 
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        
+    if (count($result) > 0) {
+        $row = $result[0];
         // OJO: Tus passwords están en texto plano en la DB. Deberías usar password_hash()
         // Por ahora compara directo, pero cámbialo a password_verify() cuando hagas hash
         if ($password === $row['password']) {
@@ -36,7 +34,6 @@ if (isset($_POST['login'])) {
     } else {
         $error = "Usuario o contraseña incorrecta";
     }
-    $stmt->close();
 }
 ?>
 <!DOCTYPE html>
@@ -46,7 +43,7 @@ if (isset($_POST['login'])) {
     <link rel="icon" type="image/png" sizes="32x32" href="ley.png">
     <link rel="stylesheet" href="style.css">
     <style>
-      .nav-bar {
+     .nav-bar {
     position: fixed;
     top: 0;
     left: 0;

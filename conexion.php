@@ -1,14 +1,11 @@
 <?php
-// Conexion PDO para Railway MySQL
-// Railway inyecta variables con prefijo MYSQL*, no DB_*
+// conexion.php - PDO para Railway MySQL
+$host = getenv('MYSQLHOST');     // mysql.railway.internal
+$port = getenv('MYSQLPORT');     // 3306
+$db   = getenv('MYSQLDATABASE'); // railway
+$user = getenv('MYSQLUSER');     // root
+$pass = getenv('MYSQLPASSWORD'); // tu password
 
-$host = getenv('MYSQLHOST');
-$port = getenv('MYSQLPORT'); 
-$db   = getenv('MYSQLDATABASE');
-$user = getenv('MYSQLUSER');
-$pass = getenv('MYSQLPASSWORD');
-
-// Si alguna variable falta, truena con mensaje claro
 if (!$host || !$db || !$user) {
     die("Error: Variables de MySQL no encontradas. Asegúrate de linkear el servicio MySQL en Railway > Variables > Add Reference");
 }
@@ -24,7 +21,6 @@ try {
     $conn = new PDO($dsn, $user, $pass, $options);
     
 } catch(PDOException $e) {
-    // En producción quita el $e->getMessage() para no exponer detalles
     die("Error de conexión MySQL: " . $e->getMessage());
 }
 ?>

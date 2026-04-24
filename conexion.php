@@ -1,10 +1,14 @@
 <?php
-// Conexion para Railway usando PDO
-$host = getenv('DB_HOST');
-$port = getenv('DB_PORT');
-$db = getenv('DB_NAME');
-$user = getenv('DB_USER');
-$pass = getenv('DB_PASS');
+// Conexion para Railway usando variables nativas de MySQL
+$host = getenv('MYSQLHOST');
+$port = getenv('MYSQLPORT'); 
+$db   = getenv('MYSQLDATABASE');
+$user = getenv('MYSQLUSER');
+$pass = getenv('MYSQLPASSWORD');
+
+if (!$host || !$db || !$user) {
+    die("Error: Variables de entorno de MySQL no encontradas en Railway");
+}
 
 try {
     $conn = new PDO("mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4", $user, $pass);

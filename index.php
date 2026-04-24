@@ -1,27 +1,40 @@
 <?php
-// Código PHP
 include('conexion.php');
+session_start();
+
+$error = '';
 
 if (isset($_POST['login'])) {
-    $username = $_POST['username'];
+    $username = $conn->real_escape_string($_POST['username']);
     $password = $_POST['password'];
 
-    $query = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
-    $result = $conn->query($query);
+    // Usar prepared statements para evitar SQL injection
+    $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        session_start();
-        $_SESSION['username'] = $username;
-        if (strtolower($username) == 'admin') {
-            header("Location: dashboard_admin.php");
-            exit;
+        $row = $result->fetch_assoc();
+        // Si aún no tienes hash, compara directo. PERO DEBES CAMBIAR A password_verify()
+        if ($password === $row['password']) {
+            $_SESSION['username'] = $username;
+            $_SESSION['id'] = $row['id'];
+            
+            if (strtolower($username) == 'admin') {
+                header("Location: dashboard_admin.php");
+                exit;
+            } else {
+                header("Location: dashboard.php");
+                exit;
+            }
         } else {
-            header("Location: dashboard.php");
-            exit;
+            $error = "Usuario o contraseña incorrecta";
         }
     } else {
         $error = "Usuario o contraseña incorrecta";
     }
+    $stmt->close();
 }
 ?>
 <!DOCTYPE html>

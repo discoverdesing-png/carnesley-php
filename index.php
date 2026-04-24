@@ -22,20 +22,18 @@ if (isset($_POST['login'])) {
     if ($username === '' || $password === '') {
         $error = 'Por favor, rellene todos los campos';
     } else {
-        // Prepared statement = sin SQL injection
-        // BUG ARREGLADO: antes tenías "username =?" sin espacio
+        // BUG ARREGLADO: tenías "username =?" sin espacio. PDO falla así.
         $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username = ?");
         $stmt->execute([$username]);
-        $result = $stmt->fetch();
+        $user = $stmt->fetch();
 
-        if ($result) {
-            // IMPORTANTE: Tus passwords están en texto plano en la DB. 
-            // Cuando uses password_hash(), cambia esto a: password_verify($password, $result['password'])
-            if ($password === $result['password']) {
-                $_SESSION['username'] = $result['username'];
-                $_SESSION['id'] = $result['id'];
+        if ($user) {
+            // OJO: Tus passwords están en texto plano. Cuando uses password_hash(), cambia a password_verify()
+            if ($password === $user['password']) {
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['id'] = $user['id'];
                 
-                if (strtolower($result['username']) == 'admin') {
+                if (strtolower($user['username']) == 'admin') {
                     header("Location: dashboard_admin.php");
                     exit;
                 } else {

@@ -5,10 +5,10 @@ session_start();
 $error = '';
 
 if (isset($_POST['login'])) {
-    $username = $conn->real_escape_string($_POST['username']);
+    $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Usar prepared statements para evitar SQL injection
+    // Prepared statement = sin SQL injection
     $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
@@ -16,7 +16,7 @@ if (isset($_POST['login'])) {
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
-        // Si aún no tienes hash, compara directo. PERO DEBES CAMBIAR A password_verify()
+        // OJO: Tus passwords están en texto plano. Deberías usar password_hash()
         if ($password === $row['password']) {
             $_SESSION['username'] = $username;
             $_SESSION['id'] = $row['id'];

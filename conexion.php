@@ -1,14 +1,12 @@
 <?php
-// conexion.php para Railway + PDO
-
 $host = getenv('MYSQLHOST');
 $port = getenv('MYSQLPORT'); 
-$db   = getenv('MYSQLDATABASE'); // En Railway siempre es "railway"
-$user = getenv('MYSQLUSER');     // En Railway siempre es "root"
+$db   = getenv('MYSQLDATABASE'); // Será "railway"
+$user = getenv('MYSQLUSER');     // Será "root"
 $pass = getenv('MYSQLPASSWORD');
 
 if (!$host || !$db || !$user) {
-    die("Error: Faltan variables de MySQL. Revisa Add Reference en Railway");
+    die("Error: Faltan variables de MySQL");
 }
 
 try {

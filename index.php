@@ -5,18 +5,20 @@ session_start();
 $error = '';
 
 if (isset($_POST['login'])) {
-    $username = $_POST['username'];
+    $username = trim($_POST['username']);
     $password = $_POST['password'];
 
     // Prepared statement = sin SQL injection
-    $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username = ?");
+    $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username =?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
-        // OJO: Tus passwords están en texto plano. Deberías usar password_hash()
+        
+        // OJO: Tus passwords están en texto plano en la DB. Deberías usar password_hash()
+        // Por ahora compara directo, pero cámbialo a password_verify() cuando hagas hash
         if ($password === $row['password']) {
             $_SESSION['username'] = $username;
             $_SESSION['id'] = $row['id'];
@@ -44,7 +46,7 @@ if (isset($_POST['login'])) {
     <link rel="icon" type="image/png" sizes="32x32" href="ley.png">
     <link rel="stylesheet" href="style.css">
     <style>
-       .nav-bar {
+      .nav-bar {
     position: fixed;
     top: 0;
     left: 0;
@@ -75,7 +77,7 @@ if (isset($_POST['login'])) {
             <input type="password" id="password" name="password" placeholder="Contraseña" autocomplete="nope" readonly onfocus="this.removeAttribute('readonly');">
             <input type="submit" name="login" value="Aceptar">
         </form>
-        <div id="error-message"><?php if (isset($error)) { echo $error; } ?></div>
+        <div id="error-message"><?php if (isset($error)) { echo $error; }?></div>
     </div>
 
     <script>
